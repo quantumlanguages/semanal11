@@ -1,0 +1,61 @@
+% type
+\documentclass{article}
+
+% page format
+\usepackage[letterpaper, margin=1.25cm]{geometry}
+
+% math env
+\usepackage{amsmath}
+
+% math symbs
+\usepackage{amssymb}
+
+% inferences
+\usepackage{ebproof}
+
+% macros
+\newcommand{\lm}{\lambda}
+\newcommand{\G}{\Gamma}
+\newcommand{\x}{\times}
+\newcommand{\bx}{\rightarrow^{\star}}
+\newcommand{\tx}[1]{\texttt{#1}}
+
+\title{
+    Lenguajes de Programación 2020-1\\
+    Facultad de Ciencias UNAM\\
+    Ejericio Semanal 11
+}
+
+\author{
+    Sandra del Mar Soto Corderi\\
+    Edgar Quiroz Castañeda
+}
+
+\date{
+    7 de noviembre de 2019
+}
+
+\begin{document}
+    %header
+    \maketitle
+	\begin{enumerate}
+		\item {
+		Considera el siguiente programa\\
+		$\texttt{exception Excpt of int ;}$\\
+		$\texttt{fun twice (f , x ) = handle f ( f ( x ) ) with Excpt ( x ) = > x ;}$\\
+		$\texttt{fun pred ( x ) = if iszero x then raise Excpt ( x ) else x - 1;}$\\
+		$\texttt{fun smart ( x ) = handle 1 + pred ( x ) with Excpt ( x ) = > 1;}$\\
+		
+		Evalúa las siguientes expresiones utilizando la semántica operacional de la máquina K extendida para manejar excepciones con valor. (pueden obviarse algunos pasos pero no los que involucran manejo de excepciones. En cada caso describe qué excepción fue lanzada y en dónde.)\\
+		\begin{itemize}
+			\item {
+			$\texttt{twice(smart, 0)}$
+			}
+			\item {
+			$\texttt{twice(pred, 1)}$
+			}
+		\end{itemize}
+		
+		}
+	\end{enumerate}
+\end{document}
