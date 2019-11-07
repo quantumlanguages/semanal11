@@ -19,6 +19,7 @@
 \newcommand{\x}{\times}
 \newcommand{\bx}{\rightarrow^{\star}}
 \newcommand{\tx}[1]{\texttt{#1}}
+\newcommand{\ra}{\rightarrow}
 
 \title{
     Lenguajes de Programación 2020-1\\
@@ -40,19 +41,68 @@
     \maketitle
 	\begin{enumerate}
 		\item {
-		Considera el siguiente programa\\
-		$\texttt{exception Excpt of int ;}$\\
-		$\texttt{fun twice (f , x ) = handle f ( f ( x ) ) with Excpt ( x ) = > x ;}$\\
-		$\texttt{fun pred ( x ) = if iszero x then raise Excpt ( x ) else x - 1;}$\\
-		$\texttt{fun smart ( x ) = handle 1 + pred ( x ) with Excpt ( x ) = > 1;}$\\
+		Considera el siguiente programa
+
+		\tx{exception Excpt of int ;}\\
+		\tx{fun twice (f , x ) = handle f ( f ( x ) ) with Excpt ( x ) = > x ;}\\
+		\tx{fun pred ( x ) = if iszero x then raise Excpt ( x ) else x - 1;}\\
+		\tx{fun smart ( x ) = handle 1 + pred ( x ) with Excpt ( x ) = > 1;}
 		
-		Evalúa las siguientes expresiones utilizando la semántica operacional de la máquina K extendida para manejar excepciones con valor. (pueden obviarse algunos pasos pero no los que involucran manejo de excepciones. En cada caso describe qué excepción fue lanzada y en dónde.)\\
+		Evalúa las siguientes expresiones utilizando la semántica operacional de
+		la máquina K extendida para manejar excepciones con valor. (pueden
+		obviarse algunos pasos pero no los que involucran manejo de excepciones.
+		En cada caso describe qué excepción fue lanzada y en dónde.)
+
 		\begin{itemize}
 			\item {
-			$\texttt{twice(smart, 0)}$
+			\texttt{twice(smart, 0)}
+
+			Cuando se tenga una aplicación con valores bloqueados, se saltarán 
+			los pasos hasta el cálculo que los concierna, ignorando los pasos 
+			intermedios para verificar que son valores.
+
+			\begin{align*}
+				&\square \succ \tx{app(twice, (smart, 0))} \\
+				&\ra_k \square \succ \tx{twice[f := twice, x := 0]}\\
+				&\ra_{\beta} \square \succ \tx{handle(app(smart, app(smart, 0)), x.x)}\\
+				&\ra_k \tx{handle(\_, x.x)} \succ \tx{app(smart, app(smart, 0))} \\
+				& \ra_k \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \succ \tx{app(smart, 0)}\\
+				&\ra_k \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \succ \tx{smart[x := 0]} \\
+				&\ra_{\beta} \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \succ \tx{handle(sum(1, app(pred,0)), x.1)} \\
+				&\ra_k \tx{handle(\_, x.1)}, \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \succ \tx{sum(1, app(pred,0))} \\
+				&\ra_k \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \succ \tx{app(pred,0)} \\
+				&\ra_k \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \succ \tx{pred[x:=0]} \\
+				&\ra_{\beta} \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \succ \tx{if(iszero(0), raise(0), dif(0, 1))}\\
+				&\ra_k \tx{if(\_, raise(0), dif(0, 1))}, \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \succ \tx{iszero(0)} \\
+				&\ra_k \tx{if(\_, raise(0), dif(0, 1))}, \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \prec \tx{true} \\
+				&\ra_k \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \gg \tx{raise(0)} \\
+			\end{align*}
+
+			En este punto se lanza una excepción de tipo \tx{Excpt} con un valor
+			de 0.
+
+			\begin{align*}
+				&\ra_k \tx{handle(\_, x.1)}, \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \gg \tx{raise(0)} \\
+				&\ra_k \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \succ \tx{1[x:=0]} \\
+				&\ra_{\beta} \tx{app(smart, \_)}, \tx{handle(\_, x.x)} \succ 1 \\
+				&\ra_k \tx{handle(\_, x.x)} \succ \tx{smart[x:=1]} \\
+				&\ra_{\beta} \tx{handle(\_, x.x)} \succ \tx{handle(sum(1, app(pred,1)), x.1)} \\
+				&\ra_k \tx{handle(\_, x.1)}, \tx{handle(\_, x.x)} \succ \tx{sum(1, app(pred,1))}\\
+				&\ra_k \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{handle(\_, x.x)} \succ \tx{app(pred,1)}\\
+				&\ra_k \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{handle(\_, x.x)} \succ \tx{pred[x:=1]}\\
+				&\ra_{\beta} \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{handle(\_, x.x)} \succ \tx{if(iszero(1), raise(1), dif(1, 1))}\\
+				&\ra_k \tx{if(\_, raise(1), dif(1, 1))}, \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{handle(\_, x.x)} \succ \tx{iszero(1)}\\
+				&\ra_k \tx{if(\_, raise(1), dif(1, 1))}, \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{handle(\_, x.x)} \prec \tx{false}\\
+				&\ra_k \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{handle(\_, x.x)} \succ \tx{dif(1, 1)}\\
+				&\ra_k \tx{sum(1, \_)}, \tx{handle(\_, x.1)}, \tx{handle(\_, x.x)} \prec 0\\
+				&\ra_k \tx{handle(\_, x.1)}, \tx{handle(\_, x.x)} \succ \tx{sum(1, 0)}\\
+				&\ra_k \tx{handle(\_, x.1)}, \tx{handle(\_, x.x)} \prec 1\\
+				&\ra_k \tx{handle(\_, x.x)} \prec 1\\
+				&\ra_k \square \prec 1\\
+			\end{align*}
 			}
 			\item {
-			$\texttt{twice(pred, 1)}$
+			\texttt{twice(pred, 1)}
 			}
 		\end{itemize}
 		
