@@ -127,6 +127,14 @@
 				&\ra_k \tx{if(\_, raise(0), dif(0, 1))}, \tx{handle(\_, x.x)} \succ \tx{iszero(0)} \\
 				&\ra_k \tx{if(\_, raise(0), dif(0, 1))}, \tx{handle(\_, x.x)} \prec \tx{true} \\
 				&\ra_k \tx{handle(\_, x.x)} \ll \tx{raise(0)} \\
+			\end{align*}
+
+			En este punto se lanza una excepción de tipo \tx{Excpt} con un valor
+			0.
+
+			Se continua la evaluación del programa.
+
+			\begin{align*}
 				&\ra_k \square \succ \tx{x[x:=0]} \\
 				&\ra_{\beta} \square \succ 0 \\
 				&\ra_k \square \prec 0 \\
